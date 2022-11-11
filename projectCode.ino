@@ -8,10 +8,15 @@
 #define line_detector_front1 A9
 #define line_detector_front2 A10
 #define line_detector_front3 A11
-VL53L1X sensorToF;
+#define VL53L1X sensorToF;
+
+void watchdogSetup(void){
+
+}
 
 void setup() {
   // put your setup code here, to run once:
+  watchdogEnable(1000); //enable watchdog timer with timeout of 1s
   Serial.begin(115200);
   Wire.begin();
   Wire.setClock(400000); //400kHz I2C
@@ -37,6 +42,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  watchdogReset();
   forward();
   bool line = checkForLine();
   bool obstacle = checkForObstacle();
