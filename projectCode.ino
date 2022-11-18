@@ -8,7 +8,8 @@
 #define line_detector_front1 A9
 #define line_detector_front2 A10
 #define line_detector_front3 A11
-#define VL53L1X sensorToF;
+VL53L1X sensorToF;
+int state = 0;
 
 void watchdogSetup(void){
 
@@ -43,15 +44,38 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   watchdogReset();
-  forward();
   bool line = checkForLine();
   bool obstacle = checkForObstacle();
-  if (line){
-    backward();
-  } 
-  /*if (obstacle){
-    stop();
-  }*/
+  printf("Current state is: %i\n", state);
+  switch(state){
+    case 0:
+      forward();
+      if (line || obstacle){
+        stop();
+        state = 1;
+      } else {
+        state = 0;
+      }
+      break;
+    case 1: 
+      right();
+      if (line || obstacle){
+        stop();
+        state = 2;
+      } else {
+        state = 0;
+      }
+      break;
+    case 2:
+      left();
+      if (line || obstacle){
+        stop();
+        state = 2;
+      } else {
+        state = 0;
+      }
+      break;
+  }
   delay(1000);
 }
 
@@ -60,6 +84,7 @@ bool checkForLine(){
   int front2 = digitalRead(line_detector_front2);
   int front3 = digitalRead(line_detector_front3);
   int sum = front1+front2+front3;
+  printf("Left: %i Middle: %i Right: %i\n", front1, front2, front3);
   if (sum == 3)
     return true;
   else
@@ -76,6 +101,7 @@ bool checkForObstacle(){
 }
 
 void forward(){
+  printf("FORWARD\n");
   analogWrite(left_motor_en, 255);
   analogWrite(right_motor_en, 255);
   digitalWrite(left_motor_dir, LOW);
@@ -83,6 +109,7 @@ void forward(){
 }
 
 void backward(){
+  printf("BACKWARD\n");
   analogWrite(left_motor_en, 255);
   analogWrite(right_motor_en, 255);
   digitalWrite(left_motor_dir, HIGH);
@@ -90,20 +117,25 @@ void backward(){
 }
 
 void left(){
+  printf("LEFT\n");
   analogWrite(left_motor_en, 255);
   analogWrite(right_motor_en, 255);
   digitalWrite(left_motor_dir, HIGH);
   digitalWrite(right_motor_dir, HIGH);
+  delay(700);
 }
 
 void right(){ 
+  printf("RIGHT\n");
   analogWrite(left_motor_en, 255);
   analogWrite(right_motor_en, 255);
   digitalWrite(left_motor_dir, LOW);
   digitalWrite(left_motor_dir, LOW);
+  delay(700);
 }
 
 void stop(){
+  printf("STOP\n");
   analogWrite(left_motor_en, 0);
   analogWrite(right_motor_en, 0);
   digitalWrite(left_motor_dir, LOW);
