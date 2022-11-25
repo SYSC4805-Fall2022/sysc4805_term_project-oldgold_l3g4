@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 void forward();
+void slowForward();
 void backward();
 void left();
 void right();

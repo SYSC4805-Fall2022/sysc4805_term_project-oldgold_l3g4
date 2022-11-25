@@ -12,6 +12,14 @@ void forward(){
   digitalWrite(right_motor_dir, HIGH);
 }
 
+void slowForward(){
+  printf("FORWARD SLOWER\n");
+  analogWrite(left_motor_en, 200);
+  analogWrite(right_motor_en, 200);
+  digitalWrite(left_motor_dir, LOW);
+  digitalWrite(right_motor_dir, HIGH);
+}
+
 void backward(){
   printf("BACKWARD\n");
   analogWrite(left_motor_en, 255);

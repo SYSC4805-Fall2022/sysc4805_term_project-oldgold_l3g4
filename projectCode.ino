@@ -14,6 +14,8 @@ VL53L1X sensorToF;
 int state = 0;
 volatile uint32_t CaptureCountA;
 volatile boolean CaptureFlag;
+float speed;
+boolean speedFlag; //true = too fast, false = good speed
 
 void watchdogSetup(void){
 
@@ -59,14 +61,24 @@ void loop() {
   watchdogReset();
   if (CaptureFlag) {
     CaptureFlag = 0; //Reset the flag,
-    printf("Speed: %f cm/s\n", (19.648/(CaptureCountA/42000.0/1000.0)/10.0)); //the .0 is required to type casting.
+    speed = (19.648/(CaptureCountA/42000.0/1000.0)/10.0); //the .0 is required to type casting.
+    printf("Speed: %f cm/s\n", speed); 
+    if (speed > 30){
+      speedFlag = true;
+    } else {
+      speedFlag = false;
+    }
   }
   bool line = checkForLine();
   bool obstacle = checkForObstacle();
   printf("Current state is: %i\n", state);
   switch(state){
     case 0:
-      forward();
+      if (speedFlag){
+        slowForward();
+      } else {
+        forward();
+      }
       if (line || obstacle){
         stop();
         state = 1;
@@ -97,7 +109,6 @@ void loop() {
 }
 
 void TC1_Handler() {
-  float speed;
   uint32_t status = TC0->TC_CHANNEL[1].TC_SR; //Read status register, Clear status
   if (status & TC_SR_LDRAS) { // If ISR is fired by LDRAS then ....
     CaptureCountA = TC0->TC_CHANNEL[1].TC_RA; //read TC_RA
