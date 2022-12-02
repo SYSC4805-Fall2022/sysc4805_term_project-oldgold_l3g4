@@ -10,7 +10,7 @@ bool checkForLine(){
   int front3 = digitalRead(line_detector_front3);
   int sum = front1+front2+front3;
   printf("Left: %i Middle: %i Right: %i\n", front1, front3, front2);
-  if (sum >= 2)
+  if (sum >= 3)
     return true;
   else
     return false;

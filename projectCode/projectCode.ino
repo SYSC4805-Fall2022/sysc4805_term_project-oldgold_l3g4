@@ -105,7 +105,7 @@ void loop() {
       }
       break;
   }
-  delay(1000);
+  delay(500);
 }
 
 void TC1_Handler() {
