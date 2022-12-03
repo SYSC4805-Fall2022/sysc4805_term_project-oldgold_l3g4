@@ -6,16 +6,16 @@
 
 void forward(){
   printf("FORWARD\n");
-  analogWrite(left_motor_en, 255);
-  analogWrite(right_motor_en, 255);
+  analogWrite(left_motor_en, 200);
+  analogWrite(right_motor_en, 200);
   digitalWrite(left_motor_dir, LOW);
   digitalWrite(right_motor_dir, HIGH);
 }
 
 void slowForward(){
   printf("FORWARD SLOWER\n");
-  analogWrite(left_motor_en, 200);
-  analogWrite(right_motor_en, 200);
+  analogWrite(left_motor_en, 150);
+  analogWrite(right_motor_en, 150);
   digitalWrite(left_motor_dir, LOW);
   digitalWrite(right_motor_dir, HIGH);
 }
@@ -34,7 +34,7 @@ void left(){
   analogWrite(right_motor_en, 255);
   digitalWrite(left_motor_dir, HIGH);
   digitalWrite(right_motor_dir, HIGH);
-  delay(850);
+  delay(1000);
 }
 
 void right(){ 
@@ -43,7 +43,7 @@ void right(){
   analogWrite(right_motor_en, 255);
   digitalWrite(left_motor_dir, LOW);
   digitalWrite(left_motor_dir, LOW);
-  delay(850);
+  delay(1000);
 }
 
 void stop(){
