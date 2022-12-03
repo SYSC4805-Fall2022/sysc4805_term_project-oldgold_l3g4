@@ -99,7 +99,7 @@ void loop() {
       left();
       if (line || obstacle){
         stop();
-        state = 1;
+        state = 2;
       } else {
         state = 0;
       }
