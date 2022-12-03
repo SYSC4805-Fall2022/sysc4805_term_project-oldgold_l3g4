@@ -3,26 +3,30 @@
 #include "motorControl.h"
 #include "lineDetector.h"
 
+//motor connections
 #define left_motor_en 2
 #define right_motor_en 3
 #define left_motor_dir 4
 #define right_motor_dir 5
+//line detector connections
 #define line_detector_front1 A9
 #define line_detector_front2 A10
 #define line_detector_front3 A11
-VL53L1X sensorToF;
-int state = 0;
-volatile uint32_t CaptureCountA;
-volatile boolean CaptureFlag;
-float speed;
+VL53L1X sensorToF; //time of flight sensor
+int state = 0; //state of robot: 0 = move forward, 1 = turn right, 2 = turn left
+//wheel encoder initializations
+volatile uint32_t CaptureCountA; //time measurement
+volatile boolean CaptureFlag; //interrupt flag
+float speed; //calculated speed
 boolean speedFlag; //true = too fast, false = good speed
 
+//Override default watchdog method
 void watchdogSetup(void){
 
 }
 
+//setup code
 void setup() {
-  // put your setup code here, to run once:
   watchdogEnable(20000); //enable watchdog timer with timeout of 20s
   Serial.begin(115200);
   Wire.begin();
@@ -37,12 +41,12 @@ void setup() {
   pinMode(line_detector_front2, INPUT);
   pinMode(line_detector_front3, INPUT);
   //ToF sensor 
-  sensorToF.setTimeout(500);
-  if (!sensorToF.init()){
+  sensorToF.setTimeout(500); //0.5s timeout
+  if (!sensorToF.init()){ 
     Serial.println("Failed to detect and initialize ToF sensor.");
     while(1);
   }
-  sensorToF.setDistanceMode(VL53L1X::Short);
+  sensorToF.setDistanceMode(VL53L1X::Short); //ToF in short mode
   sensorToF.setMeasurementTimingBudget(20000);
   sensorToF.startContinuous(50);
   //Wheel encoder
@@ -56,59 +60,59 @@ void setup() {
   NVIC_EnableIRQ(TC1_IRQn); // Enable TC1 interrupts
 }
 
+//main code to continually loop 
 void loop() {
-  // put your main code here, to run repeatedly:
-  watchdogReset();
-  if (CaptureFlag) {
+  watchdogReset(); //reset watchdog timer
+  if (CaptureFlag) { //wheel encoder interrupt
     CaptureFlag = 0; //Reset the flag,
-    speed = (19.648/(CaptureCountA/42000.0/1000.0)/10.0); //the .0 is required to type casting.
+    speed = (19.648/(CaptureCountA/42000.0/1000.0)/10.0); //calculate speed
     printf("Speed: %f cm/s\n", speed); 
-    if (speed > 30){
-      speedFlag = true;
+    if (speed > 30){ 
+      speedFlag = true; //robot going too fast
     } else {
-      speedFlag = false;
+      speedFlag = false; //robot moving below max allowed speed
     }
   }
-  bool line = checkForLine();
-  bool obstacle = checkForObstacle();
+  bool line = checkForLine(); //check robot within perimeter
+  bool obstacle = checkForObstacle(); //check for any obstacles in front of robot
   printf("Current state is: %i\n", state);
-  switch(state){
-    case 0:
-      if (speedFlag){
+  switch(state){ //state machine 
+    case 0: //move forward state
+      if (speedFlag){ //check if robot moving too fast
         slowForward();
       } else {
         forward();
       }
-      if (line || obstacle){
+      if (line || obstacle){ //check for perimeter or obstacle
         stop();
-        state = 1;
+        state = 1; //turn right 
       } else {
-        state = 0;
+        state = 0; //continue forward
       }
       break;
-    case 1: 
+    case 1: //turn right state
       right();
       if (line || obstacle){
         stop();
-        state = 2;
+        state = 2; //turn left
       } else {
-        state = 0;
+        state = 0; //continue forward
       }
       break;
-    case 2:
+    case 2: //turn left state
       left();
-      if (line || obstacle){
+      if (line || obstacle){ 
         stop();
-        state = 2;
+        state = 2; //turn left again 
       } else {
-        state = 0;
+        state = 0; //continue forward
       }
       break;
   }
-  delay(500);
+  delay(500); //poll every 0.5s
 }
 
-void TC1_Handler() {
+void TC1_Handler() { //interrupt handler
   uint32_t status = TC0->TC_CHANNEL[1].TC_SR; //Read status register, Clear status
   if (status & TC_SR_LDRAS) { // If ISR is fired by LDRAS then ....
     CaptureCountA = TC0->TC_CHANNEL[1].TC_RA; //read TC_RA
@@ -119,10 +123,11 @@ void TC1_Handler() {
   }
 }
 
+//method for obstacle detection using ToF sensor
 bool checkForObstacle(){
   sensorToF.read();
   Serial.println(sensorToF.ranging_data.range_mm);
-  if (sensorToF.ranging_data.range_mm <= 200)
+  if (sensorToF.ranging_data.range_mm <= 200) //if obstacle detected within 200mm of robot
     return true;
   else
     return false;
