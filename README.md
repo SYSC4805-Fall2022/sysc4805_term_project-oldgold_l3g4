@@ -23,7 +23,7 @@ off snow in an enclosed area without hitting any fixed or moving obstacles.
 
 ## The Scripts ```Project Code``` 
 
-### The [here](https://github.com/Abaca911/SECURITY_SYSTEM_ALERT/blob/734fced8802ac8687e5ac98bef797a579d7ec332/Figures/Fritzing_Circuit_SetUp.png)
+### The [lineDetector.cpp](https://github.com/SYSC4805-Fall2022/sysc4805_term_project-oldgold_l3g4/blob/f5fa6cdf03f40748cd4755e9c3312ee090cc197e/projectCode/lineDetector.cpp)
 
 This script is used to detect the black path line and makes use of the Line follower
 sensor.  
