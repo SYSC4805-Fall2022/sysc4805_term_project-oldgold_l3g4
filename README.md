@@ -25,16 +25,16 @@ off snow in an enclosed area without hitting any fixed or moving obstacles.
 
 ### The [lineDetector.cpp](https://github.com/SYSC4805-Fall2022/sysc4805_term_project-oldgold_l3g4/blob/f5fa6cdf03f40748cd4755e9c3312ee090cc197e/projectCode/lineDetector.cpp)
 
-This script is used to detect the black path line and makes use of the Line follower
+This C++ file is used to detect the black path line or perimeter and makes use of the Line follower
 sensor.  
 
 ### The [motorControl.cpp](https://github.com/SYSC4805-Fall2022/sysc4805_term_project-oldgold_l3g4/blob/f3e2f253620e33eb8b9833ad3b2a7756e02619ba/projectCode/motorControl.cpp)
 
-This script is used to control the motor and allow the assembly to move in any direction
-```Forward```,  ```Backward```,  ```Left``` and ```Right```. 
+This C++ file is used to control the motor and allow the assembly to move in any direction or stop
+```Forward```,  ```Backward```,  ```Left```, ```Right``` and ```Stop```. 
 
 ### The [projectCode.ino](https://github.com/SYSC4805-Fall2022/sysc4805_term_project-oldgold_l3g4/blob/f3e2f253620e33eb8b9833ad3b2a7756e02619ba/projectCode/projectCode.ino)
 
-This script is used to control the whole system and is composed of a funtion called
+This Arduino file is used to control the whole system and also has a funtion called
 ```checkForObstacle()``` which makes use of the Time of Flight sensor to detect any 
-close obstacle.
+obstacles. This file uses the previous files through the ```#include``` statemets.
